@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/main_fragment">
+
+    <!--name: 어떤 클래스인지 명시-->
+    <fragment
+        android:id="@+id/main_fragment"
+        android:name="com.example.searchbookapp.main.view.fragment.MainFragment"
+        android:label="Main">
+        <action
+            android:id="@+id/action_main_to_detail"
+            app:destination="@+id/detail_fragment"
+            app:launchSingleTop="true"/>
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/detail_fragment"
+        android:name="com.example.searchbookapp.detail.view.fragment.DetailFragment"
+        android:label="Detail">
+        <argument
+            android:name="isbn13"
+            app:argType="string"/>
+    </fragment>
+</navigation>
