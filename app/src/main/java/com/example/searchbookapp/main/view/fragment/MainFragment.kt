@@ -40,6 +40,7 @@ class MainFragment: Fragment() {
                     MainScreen(
                         searchTextStateHolder = viewModel.searchQuery.collectAsState(),
                         bookStateHolder = viewModel.output.bookState.collectAsState(),
+                        bookListTypeStateHolder = viewModel.output.bookListTypeState.collectAsState(),
                         input = viewModel.input
                     )
                 }

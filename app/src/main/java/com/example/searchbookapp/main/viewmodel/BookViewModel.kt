@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.searchbookapp.domain.model.EntityWrapper
 import com.example.searchbookapp.domain.usecase.GetThumbnailUseCase
 import com.example.searchbookapp.main.view.input.IBookViewModelInput
+import com.example.searchbookapp.main.view.output.BookListType
 import com.example.searchbookapp.main.view.output.BookState
 import com.example.searchbookapp.main.view.output.BookUiEffect
 import com.example.searchbookapp.main.view.output.IBookViewModelOutput
@@ -33,6 +34,12 @@ class BookViewModel @Inject constructor(
             MutableStateFlow("")
     val searchQuery: StateFlow<String>
         get() = _searchQuery
+
+    // 리스트 <-> 그리드 상태 처리를 위한 flow
+    private val _bookListTypeState: MutableStateFlow<BookListType> =
+        MutableStateFlow(BookListType.List)
+    override val bookListTypeState: StateFlow<BookListType>
+        get() = _bookListTypeState
 
     // 화면에 보여주기 위한 flow
     private val _bookState: MutableStateFlow<BookState> =
@@ -84,6 +91,20 @@ class BookViewModel @Inject constructor(
             _bookUiEffect.emit(
                 BookUiEffect.OpenBookDetail(isbn13)
             )
+        }
+    }
+
+    override fun changeListType() {
+        viewModelScope.launch {
+            _bookListTypeState.value =
+                when(bookListTypeState.value){
+                    is BookListType.List -> {
+                        BookListType.Grid
+                    }
+                    is BookListType.Grid -> {
+                        BookListType.List
+                    }
+                }
         }
     }
 
