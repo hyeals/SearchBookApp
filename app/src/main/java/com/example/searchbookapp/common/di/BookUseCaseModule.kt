@@ -4,6 +4,7 @@ import com.example.searchbookapp.data.books.BooksRemoteDataSource
 import com.example.searchbookapp.data.books.BooksRemoteDataSourceImpl
 import com.example.searchbookapp.data.books.BooksRepositoryImpl
 import com.example.searchbookapp.domain.repository.BookRepository
+import com.example.searchbookapp.domain.usecase.GetDetailBookUseCase
 import com.example.searchbookapp.domain.usecase.GetThumbnailUseCase
 import dagger.Binds
 import dagger.Module
@@ -14,7 +15,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class FeedUseCaseModule {
+abstract class BookUseCaseModule {
     @Binds
     abstract fun bindBookRepository(booksRepositoryImpl: BooksRepositoryImpl): BookRepository
 
@@ -24,6 +25,10 @@ abstract class FeedUseCaseModule {
         @Singleton
         @Provides
         fun provideGetThumbnailUseCase(bookRepository: BookRepository) = GetThumbnailUseCase(bookRepository)
+
+        @Singleton
+        @Provides
+        fun provideGetDetailBookUseCase(bookRepository: BookRepository) = GetDetailBookUseCase(bookRepository)
     }
 
 }
