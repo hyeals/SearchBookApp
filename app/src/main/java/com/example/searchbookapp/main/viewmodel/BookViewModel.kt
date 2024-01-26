@@ -72,19 +72,9 @@ class BookViewModel @Inject constructor(
         }
     }
 
-    override fun openInfoDialog() {
-        viewModelScope.launch {
-            _bookUiEffect.emit(
-                BookUiEffect.OpenInfoDialog
-            )
-        }
-    }
-
     override fun refreshMain() {
         viewModelScope.launch {
-//            _feedUiEffect.emit(
-////                FeedUiEffect.OpenMovieDetail(movieName)
-//            )
+            fetchMain()
         }
     }
 }
