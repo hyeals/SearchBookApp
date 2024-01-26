@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface IBookViewModelOutput {
+    val bookListTypeState: StateFlow<BookListType>
     val bookState: StateFlow<BookState>
     val bookUiEffect: SharedFlow<BookUiEffect>
 }
