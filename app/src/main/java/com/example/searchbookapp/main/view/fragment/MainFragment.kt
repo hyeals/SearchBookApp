@@ -13,9 +13,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.example.searchbookapp.main.view.output.BookUiEffect
 import com.example.searchbookapp.main.view.screen.MainScreen
 import com.example.searchbookapp.main.viewmodel.BookViewModel
+import com.example.searchbookapp.ui.navigation.safeNavigate
 import com.example.searchbookapp.ui.theme.SearchBookAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -45,21 +47,15 @@ class MainFragment: Fragment() {
     }
 
     private fun observeUiEffects() {
-//        val navController = NavHostFragment.findNavController()
+        val navController = findNavController()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.output.bookUiEffect.collectLatest {
                     when (it) {
                         is BookUiEffect.OpenBookDetail -> {
-//                            navController.safeNavigate(
-//                                FeedFragmentDirections.actionFeedToDetail(it.movieName)
-//                            )
-                        }
-
-                        is BookUiEffect.OpenInfoDialog -> {
-//                            navController.safeNavigate(
-//                                FeedFragmentDirections.actionFeedToInfo()
-//                            )
+                            navController.safeNavigate(
+                                MainFragmentDirections.actionMainToDetail(it.isbn13)
+                            )
                         }
                     }
                 }

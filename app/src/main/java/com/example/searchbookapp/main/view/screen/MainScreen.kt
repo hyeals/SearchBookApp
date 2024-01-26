@@ -106,19 +106,6 @@ fun AppBarMenu(
                     .background(color = btnColor)
             )
         }
-
-        IconButton(
-            onClick = {
-                input.openInfoDialog()
-            }
-        ) {
-            Icon(
-                // todo 이미지 변경 필요
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = "Information",
-                tint = MaterialTheme.colors.onPrimary
-            )
-        }
     }
 }
 
