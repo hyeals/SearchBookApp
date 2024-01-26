@@ -29,5 +29,5 @@ data class BookDetailResponse(
     val desc: String = "",
     @SerializedName("url")
     val url: String
-    // todo: Pdf 처리
+    // Todo: Pdf 처리
 )

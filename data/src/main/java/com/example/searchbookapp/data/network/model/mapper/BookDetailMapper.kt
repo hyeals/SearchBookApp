@@ -7,24 +7,21 @@ import com.example.searchbookapp.domain.model.EntityWrapper
 import javax.inject.Inject
 
 class BookDetailMapper @Inject constructor()
-    : BaseMapper<List<BookDetailResponse>, List<BookDetail>>() {
+    : BaseMapper<BookDetailResponse, BookDetail>() {
     override fun getSuccess(
-        model: List<BookDetailResponse>?,
+        model: BookDetailResponse?,
         extra: Any?
-    ): EntityWrapper.Success<List<BookDetail>> {
+    ): EntityWrapper.Success<BookDetail> {
         return model?.let {
             EntityWrapper.Success(
-                entity = mutableListOf<BookDetail>()
-                    .apply {
-                        addAll(model.map { it.toDetailBook() })
-                    }
+                entity = model.toDetailBook()
             )
         } ?: EntityWrapper.Success(
-            entity = listOf()
+            entity = BookDetail()
         )
     }
 
-    override fun getFailure(error: Throwable): EntityWrapper.Fail<List<BookDetail>> {
+    override fun getFailure(error: Throwable): EntityWrapper.Fail<BookDetail> {
         return EntityWrapper.Fail(error)
     }
 }
