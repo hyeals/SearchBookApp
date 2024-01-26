@@ -6,7 +6,7 @@ data class BookResponse(
     @SerializedName("total")
     val total: String,
     @SerializedName("page")
-    val page: String,
+    val page: String? = "",
     @SerializedName("books")
     val books: List<ThumbNailBook>
 )

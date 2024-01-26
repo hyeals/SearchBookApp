@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
@@ -20,9 +21,12 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -42,70 +46,56 @@ import com.example.searchbookapp.main.view.output.BookState
 import com.example.searchbookapp.ui.book.BookItem
 import com.example.searchbookapp.ui.theme.Paddings
 
-val COMMON_HORIZONTAL_PADDING = Paddings.medium
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainScreen(
+    searchTextStateHolder: State<String>,
     bookStateHolder: State<BookState>,
     input: IBookViewModelInput
 ) {
 
-    Scaffold( // Scaffold: topBar와 body가 나뉘어져 있는 정규화된(표준화된) 형태의 화면을 구조하기 위한 컴포넌트
-        topBar = {
-            TopAppBar(
-                elevation = 0.dp,
-                modifier = Modifier
-                    .background(MaterialTheme.colors.primarySurface)
-                    .requiredHeight(70.dp),
-                title = {
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = searchTextStateHolder.value,
+                onValueChange = {
+                    input.searchBooks(it)
+                },
+                singleLine = true,
+                placeholder = {
                     Text(
-                        modifier = Modifier.padding(
-                            start = COMMON_HORIZONTAL_PADDING
-                        ),
-                        text = stringResource(id = R.string.app_name),
-                        style = MaterialTheme.typography.h3
+                        text = stringResource(id = R.string.search)
                     )
                 },
-                actions = {
-//                    AppBarMenu(
-//                        btnColor = btnColor,
-//                        changeAppColor = changeAppColor,
-//                        input = input
-//                    )
+                leadingIcon = {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.baseline_search_24),
+                        contentDescription = ""
+                    )
                 }
             )
+
+            // list <-> grid
+            // todo: 리스트와 그리드 전환 기능 구현
+            IconButton(
+                onClick = { }
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.baseline_format_list_bulleted_24),
+                    contentDescription = null
+                )
+            }
         }
-    ) {
+
         BodyContent(
             bookState = bookStateHolder.value,
             input = input
         )
-    }
-}
-
-@Composable
-fun AppBarMenu(
-    btnColor: Color,
-    changeAppColor: () -> Unit,
-    input: IBookViewModelInput
-) {
-    Row(
-        modifier = Modifier.padding(
-            end = COMMON_HORIZONTAL_PADDING
-        )
-    ) {
-        IconButton(
-            onClick = {
-                changeAppColor()
-            }
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(color = btnColor)
-            )
-        }
     }
 }
 

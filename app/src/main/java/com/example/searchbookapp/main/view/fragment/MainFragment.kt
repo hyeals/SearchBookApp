@@ -38,6 +38,7 @@ class MainFragment: Fragment() {
             setContent {
                 SearchBookAppTheme() {
                     MainScreen(
+                        searchTextStateHolder = viewModel.searchQuery.collectAsState(),
                         bookStateHolder = viewModel.output.bookState.collectAsState(),
                         input = viewModel.input
                     )
@@ -56,6 +57,9 @@ class MainFragment: Fragment() {
                             navController.safeNavigate(
                                 MainFragmentDirections.actionMainToDetail(it.isbn13)
                             )
+                        }
+                        is BookUiEffect.SearchBooks -> {
+                            viewModel.fetchMain(it.searchInput)
                         }
                     }
                 }

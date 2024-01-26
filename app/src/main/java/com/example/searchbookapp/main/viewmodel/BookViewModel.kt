@@ -28,6 +28,12 @@ class BookViewModel @Inject constructor(
         fetchMain()
     }
 
+    // 책 검색을 위한 flow
+    private val _searchQuery: MutableStateFlow<String> =
+            MutableStateFlow("")
+    val searchQuery: StateFlow<String>
+        get() = _searchQuery
+
     // 화면에 보여주기 위한 flow
     private val _bookState: MutableStateFlow<BookState> =
         MutableStateFlow(BookState.Loading)
@@ -43,11 +49,13 @@ class BookViewModel @Inject constructor(
         fetchMain()
     }
 
-    private fun fetchMain() {
+    fun fetchMain(searchInput: String = "") {
         viewModelScope.launch {
             _bookState.value = BookState.Loading
 
-            val books = getThumbnailUseCase.getThumbnailData("search/mongodb")
+            val books = getThumbnailUseCase.getThumbnailData(
+                if(searchInput.isEmpty()) "new" else "search/${searchInput}"
+            )
             _bookState.value = when(books) {
                 is EntityWrapper.Success -> {
                     BookState.Main(
@@ -63,7 +71,14 @@ class BookViewModel @Inject constructor(
             }
         }
     }
-
+    override fun searchBooks(searchInput: String) {
+        viewModelScope.launch {
+            _searchQuery.value = searchInput
+            _bookUiEffect.emit(
+                BookUiEffect.SearchBooks(searchInput)
+            )
+        }
+    }
     override fun openDetail(isbn13: String) {
         viewModelScope.launch {
             _bookUiEffect.emit(

@@ -18,7 +18,7 @@ class BookMapper @Inject constructor()
             EntityWrapper.Success(
                 entity = BaseBook(
                     total = model.total,
-                    page = model.page,
+                    page = model.page ?: "",
                     books = thumbnailBook.apply {
                         addAll(model.books.map { it.toThumbnailBook() })
                     }
