@@ -29,7 +29,7 @@ import com.example.searchbookapp.main.view.input.IBookViewModelInput
 import com.example.searchbookapp.ui.theme.SearchBookAppTheme
 
 @Composable
-fun BookItem(
+fun BookListItem(
     book: ThumbnailBook,
     input: IBookViewModelInput?
 ) {
@@ -86,6 +86,57 @@ fun BookItem(
 }
 
 @Composable
+fun BookGridItem(
+    book: ThumbnailBook,
+    input: IBookViewModelInput?
+){
+    Box(
+        modifier = Modifier.clickable { input?.openDetail(book.isbn13) }
+    ) {
+
+        Column(
+            modifier = Modifier
+                .height(216.dp)
+                .width(168.dp)
+                .padding(12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Poster(thumbnailBook = book)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = book.title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.body1
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = book.subtitle,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.body1
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = book.price,
+                style = MaterialTheme.typography.body1
+            )
+        }
+    }
+}
+
+@Composable
 fun Poster(
     thumbnailBook: ThumbnailBook
 ) {
@@ -113,8 +164,20 @@ fun Poster(
 @Composable
 fun bookItemPreView() {
     SearchBookAppTheme {
-        BookItem(book = ThumbnailBook(
-            title = "test",
+        BookListItem(book = ThumbnailBook(
+            title = "title",
+            subtitle = "subtitle",
+            price = "$14.99"
+        ), input = null )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun bookGridItemPreView() {
+    SearchBookAppTheme {
+        BookGridItem(book = ThumbnailBook(
+            title = "title",
             subtitle = "subtitle",
             price = "$14.99"
         ), input = null )
