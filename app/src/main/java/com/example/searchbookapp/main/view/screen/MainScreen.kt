@@ -170,8 +170,7 @@ fun RetryMessage(
         Image(
             modifier = Modifier
                 .requiredSize(IMAGE_SIZE),
-            // todo 이미지 변경 필요
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_launcher_background),
+            imageVector = ImageVector.vectorResource(id = R.drawable.baseline_warning_24),
             contentDescription = null
         )
 
