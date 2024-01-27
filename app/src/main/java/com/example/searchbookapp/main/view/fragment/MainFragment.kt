@@ -39,6 +39,7 @@ class MainFragment: Fragment() {
             setContent {
                 SearchBookAppTheme() {
                     MainScreen(
+                        refreshStateHolder = viewModel.isRefreshing.collectAsState(),
                         searchTextStateHolder = viewModel.searchQuery.collectAsState(),
                         bookStateHolder = viewModel.output.bookState.collectAsState(),
                         bookListTypeStateHolder = viewModel.output.bookListTypeState.collectAsState(),

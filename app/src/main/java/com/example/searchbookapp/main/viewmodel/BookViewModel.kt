@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -40,6 +41,10 @@ class BookViewModel @Inject constructor(
             MutableStateFlow("")
     val searchQuery: StateFlow<String>
         get() = _searchQuery
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean>
+        get() = _isRefreshing.asStateFlow()
 
     // 리스트 <-> 그리드 상태 처리를 위한 flow
     private val _bookListTypeState: MutableStateFlow<BookListType> =
@@ -72,6 +77,7 @@ class BookViewModel @Inject constructor(
                 )
                     .cachedIn(viewModelScope)
                     .collect {
+                        _isRefreshing.emit(false)
                         _bookState.value = BookState.Main(
                             books = MutableStateFlow(it)
                         )
@@ -113,9 +119,9 @@ class BookViewModel @Inject constructor(
         }
     }
 
-    override fun refreshMain() {
+    override fun refreshMain(searchInput: String) {
         viewModelScope.launch {
-            fetchMain()
+            fetchMain(searchInput)
         }
     }
 }

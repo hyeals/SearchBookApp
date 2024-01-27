@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,6 +24,14 @@ class DetailViewModel @Inject constructor(
 
     val inputs: IDetailViewModelInput = this
     val outputs: IDetailViewModelOutput = this
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean>
+        get() = _isRefreshing.asStateFlow()
+
+    private val _isbn13 = MutableStateFlow("")
+    val isbn13: StateFlow<String>
+        get() = _isbn13.asStateFlow()
 
     private val _detailState: MutableStateFlow<BookDetailState> =
         MutableStateFlow(BookDetailState.Initial)
@@ -36,6 +45,7 @@ class DetailViewModel @Inject constructor(
     suspend fun initDetailBook(isbn: String) {
         viewModelScope.launch {
             _detailState.value = BookDetailState.Loading
+            _isbn13.value = isbn
 
             val bookDetail = getDetailBookUseCase.getDetailBookData(isbn13 = isbn)
             _detailState.value = when(bookDetail) {
@@ -52,6 +62,7 @@ class DetailViewModel @Inject constructor(
                 }
             }
 
+            _isRefreshing.emit(false)
         }
     }
 
@@ -60,6 +71,12 @@ class DetailViewModel @Inject constructor(
             _detailUiEffect.emit(
                 DetailUiEffect.Back
             )
+        }
+    }
+
+    override fun refreshDetailBook() {
+        viewModelScope.launch {
+            initDetailBook(isbn13.value)
         }
     }
 }

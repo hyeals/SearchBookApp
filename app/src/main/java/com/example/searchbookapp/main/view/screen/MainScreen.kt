@@ -15,14 +15,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
@@ -33,10 +37,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.searchbookapp.R
-import com.example.searchbookapp.domain.model.ThumbnailBook
 import com.example.searchbookapp.main.view.input.IBookViewModelInput
 import com.example.searchbookapp.main.view.output.BookListType
 import com.example.searchbookapp.main.view.output.BookState
@@ -47,6 +49,7 @@ import com.example.searchbookapp.ui.theme.Paddings
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainScreen(
+    refreshStateHolder: State<Boolean>,
     searchTextStateHolder: State<String>,
     bookStateHolder: State<BookState>,
     bookListTypeStateHolder: State<BookListType>,
@@ -95,6 +98,8 @@ fun MainScreen(
         }
 
         BodyContent(
+            isRefreshing = refreshStateHolder.value,
+            searchInput = searchTextStateHolder.value,
             bookListType = bookListTypeStateHolder.value,
             bookState = bookStateHolder.value,
             input = input
@@ -102,20 +107,30 @@ fun MainScreen(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BodyContent(
+    isRefreshing: Boolean,
+    searchInput: String,
     bookListType: BookListType,
     bookState: BookState,
     input: IBookViewModelInput
 ) {
+
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, { input.refreshMain(searchInput) })
+
     when(bookState) {
         is BookState.Loading -> {
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pullRefresh(pullRefreshState)
+                    .verticalScroll(rememberScrollState())
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
                 )
+                PullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState, modifier = Modifier.align(Alignment.TopCenter))
             }
         }
         is BookState.Main -> {
@@ -127,44 +142,67 @@ fun BodyContent(
             when {
                 isLoading -> {
                     Box(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .pullRefresh(pullRefreshState)
+                            .verticalScroll(rememberScrollState())
                     ) {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center)
                         )
+                        PullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState, modifier = Modifier.align(Alignment.TopCenter))
                     }
                 }
                 isError -> {
-                    RetryMessage(
-                        message = stringResource(id = R.string.retry),
-                        input = input
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .pullRefresh(pullRefreshState)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        RetryMessage(
+                            searchInput = searchInput,
+                            message = stringResource(id = R.string.retry),
+                            input = input
+                        )
+                        PullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState, modifier = Modifier.align(Alignment.TopCenter))
+                    }
                 }
                 else -> {
                     when(bookListType) {
                         is BookListType.List -> {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize()
+                            Box(
+                                Modifier.pullRefresh(pullRefreshState)
                             ) {
-                                items(bookItemState.itemCount) {index ->
-                                    BookListItem(
-                                        book = bookItemState[index]!!,
-                                        input = input
-                                    )
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    items(bookItemState.itemCount) {index ->
+                                        BookListItem(
+                                            book = bookItemState[index]!!,
+                                            input = input
+                                        )
+                                    }
                                 }
+                                PullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState, modifier = Modifier.align(Alignment.TopCenter))
                             }
                         }
 
                         is BookListType.Grid -> {
-                            LazyVerticalGrid(
-                                columns = GridCells.Fixed(3)
+                            Box(
+                                Modifier.pullRefresh(pullRefreshState)
                             ) {
-                                items(bookItemState.itemCount) { index ->
-                                    BookGridItem(
-                                        book = bookItemState[index]!!,
-                                        input = input
-                                    )
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(3)
+                                ) {
+                                    items(bookItemState.itemCount) { index ->
+                                        BookGridItem(
+                                            book = bookItemState[index]!!,
+                                            input = input
+                                        )
+                                    }
                                 }
+                                PullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState, modifier = Modifier.align(Alignment.TopCenter))
                             }
                         }
                     }
@@ -173,10 +211,19 @@ fun BodyContent(
 
         }
         is BookState.Failed -> {
-            RetryMessage(
-                message = bookState.reason,
-                input = input
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pullRefresh(pullRefreshState)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                RetryMessage(
+                    searchInput = searchInput,
+                    message = bookState.reason,
+                    input = input
+                )
+                PullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState, modifier = Modifier.align(Alignment.TopCenter))
+            }
         }
     }
 }
@@ -185,6 +232,7 @@ val IMAGE_SIZE = 48.dp
 
 @Composable
 fun RetryMessage(
+    searchInput: String,
     modifier: Modifier = Modifier,
     message: String,
     input: IBookViewModelInput
@@ -211,7 +259,7 @@ fun RetryMessage(
         )
 
         Button(
-            onClick = { input.refreshMain() }
+            onClick = { input.refreshMain(searchInput) }
         ) {
             Text("RETRY")
         }

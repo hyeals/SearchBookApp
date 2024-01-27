@@ -38,6 +38,7 @@ class DetailFragment : Fragment() {
             setContent {
                 SearchBookAppTheme {
                     DetailScreen(
+                        refreshStateHolder = viewModel.isRefreshing.collectAsState(),
                         bookDetailState = viewModel.outputs.detailState.collectAsState(),
                         input = viewModel.inputs
                     )
