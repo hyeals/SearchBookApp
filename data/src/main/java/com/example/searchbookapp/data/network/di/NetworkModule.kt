@@ -1,14 +1,12 @@
 package com.example.searchbookapp.data.network.di
 
 import com.example.searchbookapp.data.BuildConfig
-import com.example.searchbookapp.data.books.BooksRemoteDataSource
 import com.example.searchbookapp.data.books.BooksRemoteDataSourceImpl
 import com.example.searchbookapp.data.network.api.ApiService
 import com.example.searchbookapp.data.network.api.NetworkRequestFactory
 import com.example.searchbookapp.data.network.retrofit.NetworkRequestFactoryImpl
 import com.example.searchbookapp.data.network.retrofit.StringConverterFactory
 import com.google.gson.Gson
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

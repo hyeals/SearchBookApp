@@ -8,7 +8,6 @@ import com.example.searchbookapp.data.network.model.response.BookResponse
 import com.example.searchbookapp.domain.model.BaseBook
 import com.example.searchbookapp.domain.model.BookDetail
 import com.example.searchbookapp.domain.model.EntityWrapper
-import com.example.searchbookapp.domain.model.ThumbnailBook
 import com.google.gson.reflect.TypeToken
 import javax.inject.Inject
 
