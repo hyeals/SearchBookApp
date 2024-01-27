@@ -136,8 +136,21 @@ fun BookDetail(
             BookMeta(key = "desc", value = book.desc)
             BookMeta(key = "url", value = book.url)
 
-            // todo: pdf 처리
-//            BookMeta(key = "url", value = book.title)
+            if(!book.pdf.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(Paddings.xlarge))
+                androidx.compose.material.Text(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .padding(4.dp),
+                    text = "pdf",
+                    style = MaterialTheme.typography.h6,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
+                )
+
+                for ((pdfKey, pdfData) in book.pdf!!) {
+                    BookMeta(key = pdfKey, value = pdfData)
+                }
+            }
         }
     }
 }

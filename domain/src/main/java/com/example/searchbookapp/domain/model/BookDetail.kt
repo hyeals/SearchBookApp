@@ -13,6 +13,6 @@ data class BookDetail(
     val year: String = "",
     val rating: String = "",
     val desc: String = "",
-    val url: String = ""
-    // todo: Pdf 처리
+    val url: String = "",
+    val pdf: Map<String, String>? = mutableMapOf()
 ): ThumbnailBook()

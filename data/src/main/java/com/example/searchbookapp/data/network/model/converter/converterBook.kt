@@ -14,17 +14,18 @@ fun ThumbNailBook.toThumbnailBook(): ThumbnailBook = ThumbnailBook(
 )
 
 fun BookDetailResponse.toDetailBook(): BookDetail = BookDetail(
-    title = this.title,
-    subtitle = this.subtitle,
-    isbn13 = this.isbn13,
-    price = this.price,
-    image = this.image,
-    authors = this.authors,
-    publisher = this.publisher,
-    isbn10 = this.isbn10,
-    pages = this.pages,
-    year = this.year,
-    rating = this.rating,
-    desc = this.desc,
-    url = this.url
+        title = this.title,
+        subtitle = this.subtitle,
+        isbn13 = this.isbn13,
+        price = this.price,
+        image = this.image,
+        authors = this.authors,
+        publisher = this.publisher,
+        isbn10 = this.isbn10,
+        pages = this.pages,
+        year = this.year,
+        rating = this.rating,
+        desc = this.desc,
+        url = this.url,
+        pdf = this.pdf
 )
