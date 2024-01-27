@@ -15,9 +15,13 @@ interface BooksRemoteDataSource {
     /**
      * 책 목록을 조회합니다.
      * @param searchedInput 조회할 책 목록
+     * @param page pagenation을 위한 page 값
      * @return [EntityWrapper<BaseBook>] 조회된 책 정보 목록
      */
-    suspend fun getThumbnailData(searchedInput: String): EntityWrapper<BaseBook>
+    suspend fun getThumbnailData(
+        searchedInput: String,
+        page: String
+        ): EntityWrapper<BaseBook>
 
     /**
      * 책 상세 정보를 조회합니다.
@@ -30,10 +34,10 @@ interface BooksRemoteDataSource {
 class BooksRemoteDataSourceImpl @Inject constructor(
     private val networkRequestFactory: NetworkRequestFactory
 ): BooksRemoteDataSource{
-    override suspend fun getThumbnailData(searchedInput: String): EntityWrapper<BaseBook> {
+    override suspend fun getThumbnailData(searchedInput: String, page: String): EntityWrapper<BaseBook> {
         return BookMapper().mapFromResult(
                 result = networkRequestFactory.create(
-                url = searchedInput,
+                url = if(page == "-1") searchedInput else "${searchedInput}/$page",
                 type = object : TypeToken<BookResponse>(){}.type
             )
         )
