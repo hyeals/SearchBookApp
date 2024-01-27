@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.searchbookapp.main.view.output.BookUiEffect
 import com.example.searchbookapp.main.view.screen.MainScreen
 import com.example.searchbookapp.main.viewmodel.BookViewModel

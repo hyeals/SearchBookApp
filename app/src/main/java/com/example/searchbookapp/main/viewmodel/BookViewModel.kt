@@ -2,7 +2,11 @@ package com.example.searchbookapp.main.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.PagingSource
+import androidx.paging.cachedIn
 import com.example.searchbookapp.domain.model.EntityWrapper
+import com.example.searchbookapp.domain.model.ThumbnailBook
 import com.example.searchbookapp.domain.usecase.GetThumbnailUseCase
 import com.example.searchbookapp.main.view.input.IBookViewModelInput
 import com.example.searchbookapp.main.view.output.BookListType
@@ -14,7 +18,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
@@ -56,25 +62,24 @@ class BookViewModel @Inject constructor(
         fetchMain()
     }
 
-    fun fetchMain(searchInput: String = "") {
+    fun fetchMain(searchInput: String = "", page: String = "0") {
         viewModelScope.launch {
             _bookState.value = BookState.Loading
-
-            val books = getThumbnailUseCase.getThumbnailData(
-                if(searchInput.isEmpty()) "new" else "search/${searchInput}"
-            )
-            _bookState.value = when(books) {
-                is EntityWrapper.Success -> {
-                    BookState.Main(
-                        books = books.entity.books
-                    )
-                }
-                is EntityWrapper.Fail -> {
-                    BookState.Failed(
-                        reason = books.error.message ?: "Unknown"
-                    )
-                }
-
+            try {
+                getThumbnailUseCase.getThumbnailData(
+                    searchedInput = if(searchInput.isEmpty()) "new" else "search/${searchInput}",
+                    page = page
+                )
+                    .cachedIn(viewModelScope)
+                    .collect {
+                        _bookState.value = BookState.Main(
+                            books = MutableStateFlow(it)
+                        )
+                    }
+            } catch (e: Exception) {
+                _bookState.value = BookState.Failed(
+                    e.message ?: "Unknown"
+                )
             }
         }
     }

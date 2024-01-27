@@ -32,7 +32,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.searchbookapp.R
+import com.example.searchbookapp.domain.model.ThumbnailBook
 import com.example.searchbookapp.main.view.input.IBookViewModelInput
 import com.example.searchbookapp.main.view.output.BookListType
 import com.example.searchbookapp.main.view.output.BookState
@@ -104,7 +108,7 @@ fun BodyContent(
     bookState: BookState,
     input: IBookViewModelInput
 ) {
-    when (bookState) {
+    when(bookState) {
         is BookState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -114,37 +118,60 @@ fun BodyContent(
                 )
             }
         }
-
         is BookState.Main -> {
-            when(bookListType) {
-                is BookListType.List -> {
-                    LazyColumn(
+            val bookItemState = bookState.books.collectAsLazyPagingItems()
+
+            val isLoading = bookItemState.loadState.refresh is LoadState.Loading
+            val isError = bookItemState.loadState.refresh is LoadState.Error
+
+            when {
+                isLoading -> {
+                    Box(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        itemsIndexed(bookState.books) { _, book ->
-                            BookListItem(
-                                book = book,
-                                input = input
-                            )
-                        }
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center)
+                        )
                     }
                 }
+                isError -> {
+                    RetryMessage(
+                        message = stringResource(id = R.string.retry),
+                        input = input
+                    )
+                }
+                else -> {
+                    when(bookListType) {
+                        is BookListType.List -> {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(bookItemState.itemCount) {index ->
+                                    BookListItem(
+                                        book = bookItemState[index]!!,
+                                        input = input
+                                    )
+                                }
+                            }
+                        }
 
-                is BookListType.Grid -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(3)
-                    ) {
-                        itemsIndexed(bookState.books) { _, book ->
-                            BookGridItem(
-                                book = book,
-                                input = input
-                            )
+                        is BookListType.Grid -> {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(3)
+                            ) {
+                                items(bookItemState.itemCount) { index ->
+                                    BookGridItem(
+                                        book = bookItemState[index]!!,
+                                        input = input
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
 
+        }
         is BookState.Failed -> {
             RetryMessage(
                 message = bookState.reason,
