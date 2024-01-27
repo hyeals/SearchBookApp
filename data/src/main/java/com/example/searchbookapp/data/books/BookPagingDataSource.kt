@@ -32,6 +32,8 @@ class BookPagingDataSource(
             } else if(books is EntityWrapper.Fail){
                 throw Exception(books.error)
             }
+
+            // 초기 상태 이거나 검색 결과가 없는 경우
             if(currentPage == -1 || bookTotal == "0") {
                 LoadResult.Page(
                     data = bookList,
@@ -42,7 +44,7 @@ class BookPagingDataSource(
                 LoadResult.Page(
                     data = bookList,
                     prevKey = if (currentPage == 1) null else currentPage - 1,
-                    nextKey = if (books is EntityWrapper.Fail) null else bookPage.toInt() + 1
+                    nextKey = if (bookList.isEmpty()) null else bookPage.toInt() + 1
                 )
             }
         } catch (exception: IOException) {
