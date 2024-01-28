@@ -27,7 +27,6 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,7 +79,16 @@ fun DetailScreen(
             )
         }
 
-        is BookDetailState.Failed -> {}
+        is BookDetailState.Failed -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pullRefresh(pullRefreshState)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                PullRefreshIndicator(refreshing = refreshStateHolder.value, state = pullRefreshState, modifier = Modifier.align(Alignment.TopCenter))
+            }
+        }
 
         else -> {}
     }
